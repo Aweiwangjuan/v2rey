@@ -1,0 +1,68 @@
+亚马逊云VPN搭建
+支持的操作系统 （CentOS 7+、Ubuntu 16+、Debian 8+），操作流程是一样的。在第3步申请SSL证书的时候，请输入对应系统的命令，其他的是一样的。
+亚马逊申请连接：
+https://portal.aws.amazon.com/billing/signup#/start
+安装finalshell，下载安装连接：
+
+https://www.hostbuf.com/
+
+1：开启root登入
+
+sudo su
+cd /root
+
+修改authorized_keys文件（即ssh证书）
+vi .ssh/authorized_keys
+把ssh-rsa之前的文件都删除掉了。（要按i才能删除）
+编辑ssh配置文件
+nano /etc/ssh/sshd_config
+找到PermitRootLogin，把前面的#删除改成下面这样
+PermitRootLogin yes
+ctrl+x保存退出选择y然后回车
+然后
+reboot
+重启服务器。可以使用root用户名配合秘秘登入了
+2、开启防火墙
+
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT	
+iptables -P OUTPUT ACCEPT
+iptables -F
+apt-get purge netfilter-persistent
+
+reboot 重新开始
+
+3、申请SSL证书
+
+apt update -y       # Debian/Ubuntu 命令
+apt install -y curl   # Debian/Ubuntu 命令
+apt install -y socat  # Debian/Ubuntu 命令
+
+yum update -y        #CentOS 命令
+yum install -y curl    #CentOS 命令
+yum install -y socat   #CentOS 命令
+
+curl https://get.acme.sh | sh
+~/.acme.sh/acme.sh --register-account -m 857634665@qq.com
+
+#故障真实邮箱成功率上升 
+
+~/.acme.sh/acme.sh --issue -d bbc.naiyoubba.xyz --standalone
+
+改变你的解析域
+
+~/.acme.sh/acme.sh --installcert -d bbc.naiyoubba.xyz --key-file /root/private.key --fullchain-file /root/cert.crt
+
+更换你的解析域名，此步完成后会在VPS root目录下
+看到证书公钥/root/cert.crt及验证文件/root/private.key
+
+
+4、安装X-ui面板
+
+bash <(curl -Ls https://raw.githubusercontent.com/vaxilu/x-ui/master/install.sh)
+
+
+5、安装V2ray，下载链接：
+https://github.com/2dust/v2rayN/releases
+如果打不开v2rayN.exe,可以安装.NET Framework 4.8，下载链接：
+https://docs.microsoft.com/zh-cn/dotnet/framework/install/guide-for-developers
